@@ -64,6 +64,7 @@ BEGIN_MESSAGE_MAP(C按键模拟Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON, &C按键模拟Dlg::OnBnClickedButton)
 END_MESSAGE_MAP()
 
 
@@ -99,7 +100,8 @@ BOOL C按键模拟Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-
+	//按键模拟主代码
+	PostMessage(WM_COMMAND, MAKEWPARAM(IDC_BUTTON, BN_CLICKED), NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -152,3 +154,10 @@ HCURSOR C按键模拟Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void C按键模拟Dlg::OnBnClickedButton()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	MessageBox(L"按键模拟成功！");
+}
