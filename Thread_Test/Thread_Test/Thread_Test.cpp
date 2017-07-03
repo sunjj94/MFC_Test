@@ -52,7 +52,7 @@ int main()
 
 	HANDLE hThread1 = CreateThread(NULL, 0, ThreadProc, &threadData1, 0, NULL);
 	HANDLE hThread2 = CreateThread(NULL, 0, ThreadProc, &threadData2, 0, NULL);
-	CloseHandle(hThread1);
+	CloseHandle(hThread1);//只是关闭线程句柄 并非关闭线程
 	CloseHandle(hThread2);
 
 	for (int i = 0; i < 5; i++)
