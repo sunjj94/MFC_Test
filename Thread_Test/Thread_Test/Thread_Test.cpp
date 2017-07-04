@@ -22,9 +22,10 @@ typedef struct __THREAD_DATA
 }THREAD_DATA;
 
 HANDLE g_hMutex = NULL; //互斥量
+int num = 0;
 
 //线程函数
-DWORD WINAPI ThreadProc(LPVOID lpParameter)
+DWORD WINAPI ThreadProc1(LPVOID lpParameter)
 {
 	THREAD_DATA *pThreadData = (THREAD_DATA*)lpParameter;
 
@@ -32,11 +33,31 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 	{
 		//请求获得一个互斥量锁
 		WaitForSingleObject(g_hMutex, INFINITE);//无限等待
-		printf("%s---%3d\n", pThreadData->strThreadName, i);
+		num++;
+		printf("%s---%3d\n", pThreadData->strThreadName, num);
 		Sleep(100);
 		//释放互斥量锁
 		ReleaseMutex(g_hMutex);
 	}
+	printf("%s 主函数在等我完成任务么？\n", pThreadData->strThreadName);
+	return 0;
+}
+
+DWORD WINAPI ThreadProc2(LPVOID lpParameter)
+{
+	THREAD_DATA *pThreadData = (THREAD_DATA*)lpParameter;
+
+	for (int i = 0; i < pThreadData->nMaxNum; i++)
+	{
+		//请求获得一个互斥量锁
+		WaitForSingleObject(g_hMutex, INFINITE);//无限等待
+		num++;
+		printf("%s---%3d\n", pThreadData->strThreadName, num);
+		Sleep(100);
+		//释放互斥量锁
+		ReleaseMutex(g_hMutex);
+	}
+	printf("%s 主函数在等我完成任务么？\n", pThreadData->strThreadName);
 	return 0;
 }
 
@@ -50,20 +71,28 @@ int main()
 	threadData2.nMaxNum = 10;
 	strcpy_s(threadData2.strThreadName, "线程2");
 
-	HANDLE hThread1 = CreateThread(NULL, 0, ThreadProc, &threadData1, 0, NULL);
-	HANDLE hThread2 = CreateThread(NULL, 0, ThreadProc, &threadData2, 0, NULL);
+	HANDLE hThread1 = CreateThread(NULL, 0, ThreadProc1, &threadData1, 0, NULL);
+	HANDLE hThread2 = CreateThread(NULL, 0, ThreadProc2, &threadData2, 0, NULL);
+	
+	printf("我是主线程，呵呵\n\n");
+	printf("主线程：我正在创建线程哦\n");
+	printf("主线程：我正在等待线程完成任务啊\n");
+	
+	while (1)
+	{
+		if (WaitForSingleObject(hThread1, INFINITE) == WAIT_OBJECT_0)
+		{
+			printf("线程1已结束\n");
+		}
+		if (WaitForSingleObject(hThread2, INFINITE) == WAIT_OBJECT_0)
+		{
+			printf("线程2已结束\n");
+			break;
+		}
+	}
+
 	CloseHandle(hThread1);//只是关闭线程句柄 并非关闭线程
 	CloseHandle(hThread2);
-
-	for (int i = 0; i < 5; i++)
-	{
-		//请求获得一个互斥量锁
-		WaitForSingleObject(g_hMutex, INFINITE);
-		printf("主线程：%3d\n\n", i);
-		Sleep(100);
-		//释放互斥量锁
-		ReleaseMutex(g_hMutex);
-	}
 
 	system("pause");
     return 0;
