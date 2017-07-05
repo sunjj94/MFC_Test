@@ -11,7 +11,7 @@
 #define new DEBUG_NEW
 #endif
 
-#define CM_UPDATE (WM_USER +3456)
+#define CM_UPDATE (WM_USER + 100)//自定义消息
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -67,7 +67,7 @@ BEGIN_MESSAGE_MAP(CMultiThread_DialogDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_START, &CMultiThread_DialogDlg::OnBnClickedStart)
 	ON_BN_CLICKED(IDC_STOP, &CMultiThread_DialogDlg::OnBnClickedStop)
-	ON_MESSAGE(CM_UPDATE, &CMultiThread_DialogDlg::UpdateUI)
+	ON_MESSAGE(CM_UPDATE, &CMultiThread_DialogDlg::UpdateUI)//添加消息队列
 END_MESSAGE_MAP()
 
 
@@ -163,14 +163,10 @@ volatile BOOL m_bRun;//标识线程是否运行条件
 void ThreadProc(LPVOID lpParameter)
 {
 	ThreadData *pThreadData = (ThreadData *)lpParameter;
-	CTime time;
-	CString strTime;	
+		
 	m_bRun = TRUE;
 	while (m_bRun)
-	{		
-		time = CTime::GetCurrentTime();
-		strTime = time.Format("%H:%M:%S");
-		SetDlgItemText(pThreadData->hWnd, IDC_TIME, strTime);
+	{			
 		::PostMessage(pThreadData->hWnd, CM_UPDATE, NULL, NULL);
 		Sleep(1000);
 	}
@@ -198,8 +194,13 @@ void CMultiThread_DialogDlg::OnBnClickedStop()
 }
 
 
-LRESULT CMultiThread_DialogDlg::UpdateUI(WPARAM wParam, LPARAM lParam)
+LRESULT CMultiThread_DialogDlg::UpdateUI(WPARAM wParam, LPARAM lParam)//添加消息响应函数
 {
-	UpdateData(FALSE);
+	CTime time;
+	CString strTime;
+	time = CTime::GetCurrentTime();
+	strTime = time.Format("%H:%M:%S");
+	SetDlgItemText(IDC_TIME, strTime);
+	//UpdateData(FALSE);
 	return 0;
 }
