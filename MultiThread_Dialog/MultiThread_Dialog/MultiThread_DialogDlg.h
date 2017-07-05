@@ -36,6 +36,7 @@ public:
 	afx_msg void OnBnClickedStart();	
 	afx_msg void OnBnClickedStop();
 	afx_msg LRESULT UpdateUI(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnUpdateUIState(UINT /*nAction*/, UINT /*nUIElement*/);
 };
 
 //DWORD WINAPI ThreadProc(LPVOID lpParameter);

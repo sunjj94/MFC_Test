@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CMultiThread_DialogDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_START, &CMultiThread_DialogDlg::OnBnClickedStart)
 	ON_BN_CLICKED(IDC_STOP, &CMultiThread_DialogDlg::OnBnClickedStop)
 	ON_MESSAGE(CM_UPDATE, &CMultiThread_DialogDlg::UpdateUI)//添加消息队列
+	ON_WM_UPDATEUISTATE()
 END_MESSAGE_MAP()
 
 
@@ -163,11 +164,15 @@ volatile BOOL m_bRun;//标识线程是否运行条件
 void ThreadProc(LPVOID lpParameter)
 {
 	ThreadData *pThreadData = (ThreadData *)lpParameter;
-		
+	CTime time;
+	CString strTime;
 	m_bRun = TRUE;
 	while (m_bRun)
-	{			
-		::PostMessage(pThreadData->hWnd, CM_UPDATE, NULL, NULL);
+	{		
+		time = CTime::GetCurrentTime();
+		strTime = time.Format("%H:%M:%S");
+		SetDlgItemText(pThreadData->hWnd, IDC_TIME, strTime);
+		::PostMessage(pThreadData->hWnd, WM_UPDATEUISTATE, NULL, NULL);
 		Sleep(1000);
 	}
 	//return 0;
@@ -203,4 +208,14 @@ LRESULT CMultiThread_DialogDlg::UpdateUI(WPARAM wParam, LPARAM lParam)//添加消息
 	SetDlgItemText(IDC_TIME, strTime);
 	//UpdateData(FALSE);
 	return 0;
+}
+
+
+
+void CMultiThread_DialogDlg::OnUpdateUIState(UINT /*nAction*/, UINT /*nUIElement*/)
+{
+	// 该功能要求使用 Windows 2000 或更高版本。
+	// 符号 _WIN32_WINNT 和 WINVER 必须 >= 0x0500。
+	// TODO: 在此处添加消息处理程序代码
+	UpdateData(FALSE);
 }
